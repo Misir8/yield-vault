@@ -1,0 +1,117 @@
+{
+  "SERVER": {
+    "PORT": 3001,
+    "CORS_ORIGINS": ["https://yourapp.com", "https://www.yourapp.com"]
+  },
+  "BLOCKCHAIN": {
+    "RPC_URL": "https://mainnet.infura.io/v3/YOUR_INFURA_KEY",
+    "WS_RPC_URL": "wss://mainnet.infura.io/ws/v3/YOUR_INFURA_KEY",
+    "CHAIN_ID": 1,
+    "CONFIRMATIONS": 12,
+    "GAS_LIMIT": 3000000,
+    "CONTRACTS": {
+      "VAULT": "0x...",
+      "LENDING_POOL": "0x...",
+      "STRATEGY_MANAGER": "0x...",
+      "VAULT_CONTROLLER": "0x...",
+      "ORACLE_MANAGER": "0x...",
+      "COLLATERAL_REGISTRY": "0x...",
+      "STABLE_TOKEN": "0x..."
+    }
+  },
+  "DEFI_DB": {
+    "HOST": "prod-postgres.example.com",
+    "PORT": 5432,
+    "SYNCHRONIZE": false,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "INDEXER_DB": {
+    "NAME": "indexer",
+    "HOST": "prod-postgres-indexer.example.com",
+    "PORT": 5432,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "ANALYTICS_DB": {
+    "NAME": "analytics",
+    "HOST": "prod-postgres-analytics.example.com",
+    "PORT": 5432,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "API_GATEWAY_DB": {
+    "NAME": "api_gateway",
+    "HOST": "prod-postgres-api.example.com",
+    "PORT": 5432,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "REDIS": {
+    "HOST": "prod-redis.example.com",
+    "PORT": 6379,
+    "PASSWORD": "STRONG_REDIS_PASSWORD",
+    "TLS_ENABLED": true,
+    "TTL": 7200
+  },
+  "API_GATEWAY": {
+    "PORT": 3001,
+    "URL": "https://api.yourapp.com/api/v1"
+  },
+  "KEEPER": {
+    "ENABLED": true,
+    "PORT": 3002,
+    "URL": "https://keeper.yourapp.com/api/v1/keeper",
+    "INTERVALS": {
+      "REBALANCE": 3600000,
+      "LIQUIDATION": 60000,
+      "HARVEST": 86400000,
+      "INDEXER": 15000
+    },
+    "THRESHOLDS": {
+      "MIN_HEALTH_FACTOR": 1.05,
+      "REBALANCE_DEVIATION": 0.03,
+      "MIN_PROFIT_FOR_REBALANCE": 500
+    },
+    "GAS_SETTINGS": {
+      "MAX_GAS_PRICE": "150",
+      "PRIORITY_FEE": "3"
+    }
+  },
+  "INDEXER": {
+    "ENABLED": true,
+    "PORT": 3003,
+    "URL": "https://indexer.yourapp.com/api/v1/indexer",
+    "START_BLOCK": 0,
+    "BATCH_SIZE": 1000,
+    "CONFIRMATIONS": 12,
+    "INTERVAL": 15000
+  },
+  "ANALYTICS": {
+    "ENABLED": true,
+    "PORT": 3004,
+    "URL": "https://analytics.yourapp.com/api/v1/analytics",
+    "UPDATE_INTERVAL": 300000
+  },
+  "SWAGGER": {
+    "ENABLED": false
+  },
+  "LOGGING": {
+    "LEVEL": "warn",
+    "FORMAT": "json",
+    "COLORIZE": false
+  },
+  "SECURITY": {
+    "RATE_LIMIT": {
+      "ENABLED": true,
+      "WINDOW_MS": 900000,
+      "MAX": 100
+    },
+    "HELMET": {
+      "ENABLED": true
+    }
+  },
+  "SENTRY": {
+    "ENABLED": true
+  }
+}

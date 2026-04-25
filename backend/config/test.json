@@ -1,0 +1,78 @@
+{
+  "SERVER": {
+    "PORT": 3002
+  },
+  "BLOCKCHAIN": {
+    "RPC_URL": "http://localhost:8545",
+    "WS_RPC_URL": "ws://localhost:8545",
+    "CHAIN_ID": 1337,
+    "CONFIRMATIONS": 1
+  },
+  "DEFI_DB": {
+    "HOST": "localhost",
+    "PORT": 5433,
+    "DB": "defi_test",
+    "SYNCHRONIZE": true,
+    "LOGGING": false
+  },
+  "INDEXER_DB": {
+    "NAME": "indexer_test",
+    "HOST": "localhost",
+    "PORT": 5433,
+    "DB": "defi_indexer_test",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "ANALYTICS_DB": {
+    "NAME": "analytics_test",
+    "HOST": "localhost",
+    "PORT": 5434,
+    "DB": "defi_analytics_test",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "API_GATEWAY_DB": {
+    "NAME": "api_gateway_test",
+    "HOST": "localhost",
+    "PORT": 5435,
+    "DB": "defi_api_gateway_test",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "REDIS": {
+    "HOST": "localhost",
+    "PORT": 6380,
+    "DB": 1
+  },
+  "API_GATEWAY": {
+    "PORT": 3001,
+    "URL": "http://localhost:3001/api/v1"
+  },
+  "KEEPER": {
+    "ENABLED": false,
+    "PORT": 3002,
+    "URL": "http://localhost:3002/api/v1/keeper"
+  },
+  "INDEXER": {
+    "ENABLED": false,
+    "PORT": 3003,
+    "URL": "http://localhost:3003/api/v1/indexer"
+  },
+  "ANALYTICS": {
+    "ENABLED": false,
+    "PORT": 3004,
+    "URL": "http://localhost:3004/api/v1/analytics"
+  },
+  "SWAGGER": {
+    "ENABLED": false
+  },
+  "LOGGING": {
+    "LEVEL": "error",
+    "COLORIZE": false
+  },
+  "SECURITY": {
+    "RATE_LIMIT": {
+      "ENABLED": false
+    }
+  }
+}

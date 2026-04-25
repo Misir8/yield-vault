@@ -1,0 +1,117 @@
+// Indexer Database Schema
+// Stores blockchain events and transactions
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/indexer-client"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// Blockchain Events
+model Event {
+  id            String   @id @default(uuid())
+  blockNumber   BigInt
+  blockHash     String
+  transactionHash String
+  logIndex      Int
+  eventType     String   // Deposited, Withdrawn, Borrowed, Repaid, Liquidated
+  contractAddress String
+  data          Json     // Event data
+  timestamp     DateTime
+  createdAt     DateTime @default(now())
+
+  @@index([blockNumber])
+  @@index([transactionHash])
+  @@index([eventType])
+  @@index([timestamp])
+  @@map("events")
+}
+
+// Deposits
+model Deposit {
+  id              String   @id @default(uuid())
+  user            String   // Ethereum address
+  amount          String   // BigInt as string
+  shares          String   // BigInt as string
+  blockNumber     BigInt
+  transactionHash String
+  timestamp       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([user])
+  @@index([blockNumber])
+  @@index([timestamp])
+  @@map("deposits")
+}
+
+// Withdrawals
+model Withdrawal {
+  id              String   @id @default(uuid())
+  user            String   // Ethereum address
+  amount          String   // BigInt as string
+  shares          String   // BigInt as string
+  interest        String   // BigInt as string
+  blockNumber     BigInt
+  transactionHash String
+  timestamp       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([user])
+  @@index([blockNumber])
+  @@index([timestamp])
+  @@map("withdrawals")
+}
+
+// Loans
+model Loan {
+  id              String   @id @default(uuid())
+  user            String   // Ethereum address
+  amount          String   // BigInt as string
+  collateral      String   // BigInt as string
+  blockNumber     BigInt
+  transactionHash String
+  timestamp       DateTime
+  repaidAt        DateTime?
+  liquidatedAt    DateTime?
+  status          String   // active, repaid, liquidated
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([user])
+  @@index([status])
+  @@index([blockNumber])
+  @@index([timestamp])
+  @@map("loans")
+}
+
+// Liquidations
+model Liquidation {
+  id              String   @id @default(uuid())
+  borrower        String   // Ethereum address
+  liquidator      String   // Ethereum address
+  amount          String   // BigInt as string
+  collateralSeized String  // BigInt as string
+  blockNumber     BigInt
+  transactionHash String
+  timestamp       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([borrower])
+  @@index([liquidator])
+  @@index([blockNumber])
+  @@index([timestamp])
+  @@map("liquidations")
+}
+
+// Indexer State (for tracking sync progress)
+model IndexerState {
+  id              Int      @id @default(1)
+  lastBlockNumber BigInt
+  lastBlockHash   String
+  updatedAt       DateTime @updatedAt
+
+  @@map("indexer_state")
+}

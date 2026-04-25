@@ -1,0 +1,73 @@
+// API Gateway Database Schema
+// Stores user sessions, cache, and API-specific data
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/api-gateway-client"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// User Sessions
+model Session {
+  id           String   @id @default(uuid())
+  userAddress  String
+  token        String   @unique
+  expiresAt    DateTime
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+  lastActiveAt DateTime @default(now())
+
+  @@index([userAddress])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+// API Request Logs (for rate limiting and analytics)
+model ApiLog {
+  id          String   @id @default(uuid())
+  userAddress String?
+  endpoint    String
+  method      String
+  statusCode  Int
+  responseTime Int     // milliseconds
+  ipAddress   String
+  timestamp   DateTime @default(now())
+
+  @@index([userAddress])
+  @@index([endpoint])
+  @@index([timestamp])
+  @@map("api_logs")
+}
+
+// User Preferences
+model UserPreference {
+  id              String   @id @default(uuid())
+  userAddress     String   @unique
+  notifications   Boolean  @default(true)
+  language        String   @default("en")
+  theme           String   @default("light")
+  currency        String   @default("USD")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userAddress])
+  @@map("user_preferences")
+}
+
+// Cached Data (for performance)
+model Cache {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([key])
+  @@index([expiresAt])
+  @@map("cache")
+}

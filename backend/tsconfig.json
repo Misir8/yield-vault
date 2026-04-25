@@ -1,0 +1,86 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@libs/api-decorators": [
+        "libs/api-decorators/src"
+      ],
+      "@libs/api-decorators/*": [
+        "libs/api-decorators/src/*"
+      ],
+      "@libs/exceptions": [
+        "libs/exceptions/src"
+      ],
+      "@libs/exceptions/*": [
+        "libs/exceptions/src/*"
+      ],
+      "@libs/constants": [
+        "libs/constants/src"
+      ],
+      "@libs/constants/*": [
+        "libs/constants/src/*"
+      ],
+      "@libs/logger": [
+        "libs/logger/src"
+      ],
+      "@libs/logger/*": [
+        "libs/logger/src/*"
+      ],
+      "@libs/monitoring": [
+        "libs/monitoring/src"
+      ],
+      "@libs/monitoring/*": [
+        "libs/monitoring/src/*"
+      ],
+      "@libs/database": [
+        "libs/database/src"
+      ],
+      "@libs/database/*": [
+        "libs/database/src/*"
+      ],
+      "@libs/helpers": [
+        "libs/helpers/src"
+      ],
+      "@libs/helpers/*": [
+        "libs/helpers/src/*"
+      ],
+      "@libs/health": [
+        "libs/health/src"
+      ],
+      "@libs/health/*": [
+        "libs/health/src/*"
+      ],
+      "libs/exceptions": [
+        "libs/exceptions/src"
+      ],
+      "libs/exceptions/*": [
+        "libs/exceptions/src/*"
+      ],
+      "libs/constants": [
+        "libs/constants/src"
+      ],
+      "libs/constants/*": [
+        "libs/constants/src/*"
+      ],
+    }
+  }
+}

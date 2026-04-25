@@ -1,0 +1,103 @@
+{
+  "SERVER": {
+    "PORT": 3001,
+    "CORS_ORIGINS": ["http://localhost:3000", "https://dev.yourapp.com"]
+  },
+  "BLOCKCHAIN": {
+    "RPC_URL": "https://sepolia.infura.io/v3/YOUR_INFURA_KEY",
+    "WS_RPC_URL": "wss://sepolia.infura.io/ws/v3/YOUR_INFURA_KEY",
+    "CHAIN_ID": 11155111,
+    "CONFIRMATIONS": 3,
+    "CONTRACTS": {
+      "VAULT": "0x...",
+      "LENDING_POOL": "0x...",
+      "STRATEGY_MANAGER": "0x...",
+      "VAULT_CONTROLLER": "0x...",
+      "ORACLE_MANAGER": "0x...",
+      "COLLATERAL_REGISTRY": "0x...",
+      "STABLE_TOKEN": "0x..."
+    }
+  },
+  "DEFI_DB": {
+    "HOST": "dev-postgres.example.com",
+    "PORT": 5432,
+    "SYNCHRONIZE": false,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "INDEXER_DB": {
+    "NAME": "indexer",
+    "HOST": "dev-postgres.example.com",
+    "PORT": 5432,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "ANALYTICS_DB": {
+    "NAME": "analytics",
+    "HOST": "dev-postgres.example.com",
+    "PORT": 5433,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "API_GATEWAY_DB": {
+    "NAME": "api_gateway",
+    "HOST": "dev-postgres.example.com",
+    "PORT": 5434,
+    "LOGGING": false,
+    "SSLMODE": true
+  },
+  "REDIS": {
+    "HOST": "dev-redis.example.com",
+    "PORT": 6379,
+    "PASSWORD": "REDIS_PASSWORD",
+    "TLS_ENABLED": true
+  },
+  "API_GATEWAY": {
+    "PORT": 3001,
+    "URL": "https://dev-api.yourapp.com/api/v1"
+  },
+  "KEEPER": {
+    "ENABLED": true,
+    "PORT": 3002,
+    "URL": "https://dev-keeper.yourapp.com/api/v1/keeper",
+    "INTERVALS": {
+      "REBALANCE": 1800000,
+      "LIQUIDATION": 30000,
+      "HARVEST": 43200000,
+      "INDEXER": 10000
+    },
+    "GAS_SETTINGS": {
+      "MAX_GAS_PRICE": "50",
+      "PRIORITY_FEE": "1.5"
+    }
+  },
+  "INDEXER": {
+    "ENABLED": true,
+    "PORT": 3003,
+    "URL": "https://dev-indexer.yourapp.com/api/v1/indexer",
+    "START_BLOCK": 0,
+    "BATCH_SIZE": 500,
+    "CONFIRMATIONS": 6,
+    "INTERVAL": 10000
+  },
+  "ANALYTICS": {
+    "ENABLED": true,
+    "PORT": 3004,
+    "URL": "https://dev-analytics.yourapp.com/api/v1/analytics",
+    "UPDATE_INTERVAL": 300000
+  },
+  "SWAGGER": {
+    "ENABLED": true
+  },
+  "LOGGING": {
+    "LEVEL": "info",
+    "FORMAT": "json"
+  },
+  "SECURITY": {
+    "RATE_LIMIT": {
+      "ENABLED": true,
+      "WINDOW_MS": 900000,
+      "MAX": 200
+    }
+  }
+}

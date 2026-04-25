@@ -1,0 +1,171 @@
+{
+  "SWAGGER": {
+    "ENABLED": true,
+    "TITLE": "DeFi Yield Vault API",
+    "DESCRIPTION": "API documentation for DeFi Yield Vault platform",
+    "VERSION": "1.0",
+    "PATH": "api/docs"
+  },
+  "METRICS": {
+    "ENABLED": false,
+    "EXPOSE_PORT": 9090,
+    "REQUESTS_PROCESSING_RATE": 100
+  },
+  "SENTRY": {
+    "DSN": "",
+    "ENABLED": false
+  },
+  "SERVER": {
+    "PORT": 3001,
+    "API_PREFIX": "api/v1",
+    "CORS_ENABLED": true,
+    "CORS_ORIGINS": ["http://localhost:3000", "http://localhost:3001"]
+  },
+  "BLOCKCHAIN": {
+    "RPC_URL": "http://localhost:8545",
+    "WS_RPC_URL": "ws://localhost:8545",
+    "CHAIN_ID": 1337,
+    "CONFIRMATIONS": 1,
+    "GAS_LIMIT": 5000000,
+    "GAS_PRICE": "auto",
+    "CONTRACTS": {
+      "VAULT": "",
+      "LENDING_POOL": "",
+      "STRATEGY_MANAGER": "",
+      "VAULT_CONTROLLER": "",
+      "ORACLE_MANAGER": "",
+      "COLLATERAL_REGISTRY": "",
+      "STABLE_TOKEN": ""
+    }
+  },
+  "DEFI_DB": {
+    "HOST": "localhost",
+    "PORT": 5432,
+    "USERNAME": "defi",
+    "PASSWORD": "defi_password",
+    "DB": "defi_db",
+    "SYNCHRONIZE": false,
+    "LOGGING": false,
+    "RUN_MIGRATION": true,
+    "SSLMODE": false
+  },
+  "INDEXER_DB": {
+    "NAME": "indexer",
+    "HOST": "localhost",
+    "PORT": 5432,
+    "USERNAME": "defi",
+    "PASSWORD": "defi_password",
+    "DB": "defi_indexer",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "ANALYTICS_DB": {
+    "NAME": "analytics",
+    "HOST": "localhost",
+    "PORT": 5433,
+    "USERNAME": "defi",
+    "PASSWORD": "defi_password",
+    "DB": "defi_analytics",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "API_GATEWAY_DB": {
+    "NAME": "api_gateway",
+    "HOST": "localhost",
+    "PORT": 5434,
+    "USERNAME": "defi",
+    "PASSWORD": "defi_password",
+    "DB": "defi_api_gateway",
+    "LOGGING": false,
+    "SSLMODE": false
+  },
+  "REDIS": {
+    "HOST": "localhost",
+    "PORT": 6379,
+    "PASSWORD": "",
+    "TLS_ENABLED": false,
+    "DB": 0,
+    "KEY_PREFIX": "defi:",
+    "TTL": 3600
+  },
+  "API_GATEWAY": {
+    "PORT": 3001,
+    "URL": "http://localhost:3001/api/v1",
+    "X_API_KEY": "API_GATEWAY_APIAPI_GATEWAY_APIX_API_KEY"
+  },
+  "KEEPER": {
+    "ENABLED": true,
+    "PORT": 3002,
+    "URL": "http://localhost:3002/api/v1/keeper",
+    "X_API_KEY": "KEEPER_APIKEEPER_APIX_API_KEY",
+    "INTERVALS": {
+      "REBALANCE": 3600000,
+      "LIQUIDATION": 60000,
+      "HARVEST": 86400000,
+      "INDEXER": 15000
+    },
+    "THRESHOLDS": {
+      "MIN_HEALTH_FACTOR": 1.0,
+      "REBALANCE_DEVIATION": 0.05,
+      "MIN_PROFIT_FOR_REBALANCE": 100
+    },
+    "GAS_SETTINGS": {
+      "MAX_GAS_PRICE": "100",
+      "PRIORITY_FEE": "2"
+    }
+  },
+  "INDEXER": {
+    "ENABLED": true,
+    "PORT": 3003,
+    "URL": "http://localhost:3003/api/v1/indexer",
+    "X_API_KEY": "INDEXER_APIINDEXER_APIX_API_KEY",
+    "START_BLOCK": 0,
+    "BATCH_SIZE": 1000,
+    "CONFIRMATIONS": 12,
+    "INTERVAL": 15000
+  },
+  "ANALYTICS": {
+    "ENABLED": true,
+    "PORT": 3004,
+    "URL": "http://localhost:3004/api/v1/analytics",
+    "X_API_KEY": "ANALYTICS_APIANALYTICS_APIX_API_KEY",
+    "UPDATE_INTERVAL": 300000,
+    "METRICS": {
+      "TVL": true,
+      "APY": true,
+      "UTILIZATION": true,
+      "USER_STATS": true
+    }
+  },
+  "SECURITY": {
+    "RATE_LIMIT": {
+      "ENABLED": true,
+      "WINDOW_MS": 900000,
+      "MAX": 100
+    },
+    "HELMET": {
+      "ENABLED": true
+    },
+    "JWT": {
+      "SECRET": "change-me-in-production",
+      "EXPIRES_IN": "24h"
+    }
+  },
+  "LOGGING": {
+    "LEVEL": "info",
+    "FORMAT": "json",
+    "COLORIZE": false,
+    "TIMESTAMP": true
+  },
+  "EXTERNAL_SERVICES": {
+    "INFURA": {
+      "API_KEY": ""
+    },
+    "ALCHEMY": {
+      "API_KEY": ""
+    },
+    "ETHERSCAN": {
+      "API_KEY": ""
+    }
+  }
+}

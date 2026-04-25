@@ -1,0 +1,174 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: defi-postgres
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache & Queue
+  redis:
+    image: redis:7-alpine
+    container_name: defi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: defi-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: defi
+      RABBITMQ_DEFAULT_PASS: defi_password
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway (REST API)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.api-gateway
+    container_name: defi-api-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_HOST=postgres
+      - REDIS_HOST=redis
+      - RABBITMQ_URL=amqp://defi:defi_password@rabbitmq:5672
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./apps/api-gateway:/app/apps/api-gateway
+      - ./libs:/app/libs
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Keeper Service (Rebalancing & Liquidations)
+  keeper:
+    build:
+      context: .
+      dockerfile: Dockerfile.keeper
+    container_name: defi-keeper
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - REDIS_HOST=redis
+      - RABBITMQ_URL=amqp://defi:defi_password@rabbitmq:5672
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+      - KEEPER_ENABLED=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./apps/keeper:/app/apps/keeper
+      - ./libs:/app/libs
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Indexer Service (Event Processing)
+  indexer:
+    build:
+      context: .
+      dockerfile: Dockerfile.indexer
+    container_name: defi-indexer
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - REDIS_HOST=redis
+      - RABBITMQ_URL=amqp://defi:defi_password@rabbitmq:5672
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./apps/indexer:/app/apps/indexer
+      - ./libs:/app/libs
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Analytics Service (Statistics & Reporting)
+  analytics:
+    build:
+      context: .
+      dockerfile: Dockerfile.analytics
+    container_name: defi-analytics
+    environment:
+      - NODE_ENV=development
+      - DATABASE_HOST=postgres
+      - REDIS_HOST=redis
+      - RABBITMQ_URL=amqp://defi:defi_password@rabbitmq:5672
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./apps/analytics:/app/apps/analytics
+      - ./libs:/app/libs
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+networks:
+  defi-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:

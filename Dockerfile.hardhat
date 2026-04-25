@@ -1,0 +1,18 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package.json and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy contracts and configuration
+COPY . .
+
+# Compile contracts
+RUN npx hardhat compile
+
+EXPOSE 8545
+
+# Start Hardhat node
+CMD ["npx", "hardhat", "node", "--hostname", "0.0.0.0"]

@@ -1,0 +1,92 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/api-gateway/src",
+  "monorepo": true,
+  "root": "apps/api-gateway",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "indexer": {
+      "type": "application",
+      "root": "apps/indexer",
+      "entryFile": "main",
+      "sourceRoot": "apps/indexer/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/indexer/tsconfig.app.json"
+      }
+    },
+    "keeper": {
+      "type": "application",
+      "root": "apps/keeper",
+      "entryFile": "main",
+      "sourceRoot": "apps/keeper/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/keeper/tsconfig.app.json"
+      }
+    },
+    "analytics": {
+      "type": "application",
+      "root": "apps/analytics",
+      "entryFile": "main",
+      "sourceRoot": "apps/analytics/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/analytics/tsconfig.app.json"
+      }
+    },
+    "api-decorators": {
+      "type": "library",
+      "root": "libs/api-decorators",
+      "entryFile": "index",
+      "sourceRoot": "libs/api-decorators/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/api-decorators/tsconfig.lib.json"
+      }
+    },
+    "exceptions": {
+      "type": "library",
+      "root": "libs/exceptions",
+      "entryFile": "index",
+      "sourceRoot": "libs/exceptions/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/exceptions/tsconfig.lib.json"
+      }
+    },
+    "constants": {
+      "type": "library",
+      "root": "libs/constants",
+      "entryFile": "index",
+      "sourceRoot": "libs/constants/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/constants/tsconfig.lib.json"
+      }
+    },
+    "logger": {
+      "type": "library",
+      "root": "libs/logger",
+      "entryFile": "index",
+      "sourceRoot": "libs/logger/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/logger/tsconfig.lib.json"
+      }
+    },
+    "health": {
+      "type": "library",
+      "root": "libs/health",
+      "entryFile": "index",
+      "sourceRoot": "libs/health/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/health/tsconfig.lib.json"
+      }
+    }
+  },
+  "compilerOptions": {
+    "webpack": true
+  }
+}

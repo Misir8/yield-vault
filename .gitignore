@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Environment
+.env
+.env.local
+backend/.env
+backend/apps/*/.env
+
+# Backend
+backend/dist/
+backend/node_modules/
+backend/.prisma/
+backend/node_modules/.prisma/
+backend/logs/
+backend/*.log
+
+# Prisma
+backend/apps/*/prisma/migrations/
+*.db
+*.db-journal
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+vendor/
+
+# Frontend
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Coverage
+coverage/
+coverage.json

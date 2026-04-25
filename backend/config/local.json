@@ -1,0 +1,72 @@
+{
+  "SERVER": {
+    "PORT": 3001
+  },
+  "BLOCKCHAIN": {
+    "RPC_URL": "http://localhost:8545",
+    "WS_RPC_URL": "ws://localhost:8545",
+    "CHAIN_ID": 1337,
+    "CONFIRMATIONS": 1
+  },
+  "DEFI_DB": {
+    "HOST": "localhost",
+    "PORT": 5432,
+    "SYNCHRONIZE": true,
+    "LOGGING": true
+  },
+  "INDEXER_DB": {
+    "HOST": "localhost",
+    "PORT": 5432,
+    "LOGGING": true
+  },
+  "ANALYTICS_DB": {
+    "HOST": "localhost",
+    "PORT": 5433,
+    "LOGGING": true
+  },
+  "API_GATEWAY_DB": {
+    "HOST": "localhost",
+    "PORT": 5434,
+    "LOGGING": true
+  },
+  "REDIS": {
+    "HOST": "localhost",
+    "PORT": 6379
+  },
+  "API_GATEWAY": {
+    "PORT": 3001,
+    "URL": "http://localhost:3001/api/v1"
+  },
+  "KEEPER": {
+    "ENABLED": true,
+    "PORT": 3002,
+    "URL": "http://localhost:3002/api/v1/keeper",
+    "INTERVALS": {
+      "REBALANCE": 60000,
+      "LIQUIDATION": 10000,
+      "HARVEST": 300000,
+      "INDEXER": 5000
+    }
+  },
+  "INDEXER": {
+    "ENABLED": true,
+    "PORT": 3003,
+    "URL": "http://localhost:3003/api/v1/indexer",
+    "START_BLOCK": 0,
+    "BATCH_SIZE": 100,
+    "INTERVAL": 5000
+  },
+  "ANALYTICS": {
+    "ENABLED": true,
+    "PORT": 3004,
+    "URL": "http://localhost:3004/api/v1/analytics",
+    "UPDATE_INTERVAL": 60000
+  },
+  "SWAGGER": {
+    "ENABLED": true
+  },
+  "LOGGING": {
+    "LEVEL": "debug",
+    "COLORIZE": true
+  }
+}

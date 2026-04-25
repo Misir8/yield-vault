@@ -1,0 +1,92 @@
+// Analytics Database Schema
+// Stores aggregated statistics and metrics
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/analytics-client"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+// Daily Protocol Statistics
+model DailyStats {
+  id              String   @id @default(uuid())
+  date            DateTime @unique
+  tvl             String   // Total Value Locked (BigInt as string)
+  apy             Float    // Annual Percentage Yield
+  utilizationRate Float    // Utilization rate (0-1)
+  totalDeposits   String   // BigInt as string
+  totalLoans      String   // BigInt as string
+  activeUsers     Int
+  newUsers        Int
+  transactionCount Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([date])
+  @@map("daily_stats")
+}
+
+// Hourly Protocol Statistics
+model HourlyStats {
+  id              String   @id @default(uuid())
+  timestamp       DateTime @unique
+  tvl             String   // Total Value Locked
+  apy             Float
+  utilizationRate Float
+  createdAt       DateTime @default(now())
+
+  @@index([timestamp])
+  @@map("hourly_stats")
+}
+
+// User Statistics
+model UserStats {
+  id              String   @id @default(uuid())
+  userAddress     String   @unique
+  totalDeposited  String   // BigInt as string
+  totalWithdrawn  String   // BigInt as string
+  totalBorrowed   String   // BigInt as string
+  totalRepaid     String   // BigInt as string
+  currentBalance  String   // BigInt as string
+  currentDebt     String   // BigInt as string
+  depositCount    Int
+  withdrawalCount Int
+  loanCount       Int
+  lastActivityAt  DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userAddress])
+  @@index([lastActivityAt])
+  @@map("user_stats")
+}
+
+// Protocol Revenue
+model Revenue {
+  id              String   @id @default(uuid())
+  date            DateTime
+  interestEarned  String   // BigInt as string
+  liquidationFees String   // BigInt as string
+  totalRevenue    String   // BigInt as string
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+  @@map("revenue")
+}
+
+// Top Users Leaderboard
+model Leaderboard {
+  id              String   @id @default(uuid())
+  userAddress     String
+  rank            Int
+  category        String   // deposits, loans, interest_earned
+  value           String   // BigInt as string
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userAddress, category])
+  @@index([category, rank])
+  @@map("leaderboard")
+}

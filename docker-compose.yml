@@ -1,0 +1,270 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # DATABASES
+  # ==========================================
+  
+  # PostgreSQL for Indexer
+  postgres-indexer:
+    image: postgres:16-alpine
+    container_name: defi-postgres-indexer
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_indexer
+    volumes:
+      - postgres-indexer-data:/var/lib/postgresql/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for Analytics
+  postgres-analytics:
+    image: postgres:16-alpine
+    container_name: defi-postgres-analytics
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_analytics
+    volumes:
+      - postgres-analytics-data:/var/lib/postgresql/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for API Gateway
+  postgres-api-gateway:
+    image: postgres:16-alpine
+    container_name: defi-postgres-api-gateway
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_api_gateway
+    volumes:
+      - postgres-api-gateway-data:/var/lib/postgresql/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: defi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # ==========================================
+  # BLOCKCHAIN
+  # ==========================================
+  
+  # Hardhat local blockchain node
+  hardhat:
+    build:
+      context: .
+      dockerfile: Dockerfile.hardhat
+    container_name: defi-hardhat
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+      - ./test:/app/test
+      - ./artifacts:/app/artifacts
+      - ./cache:/app/cache
+    networks:
+      - defi-network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==========================================
+  # BACKEND MICROSERVICES
+  # ==========================================
+  
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: api-gateway
+    container_name: defi-api-gateway
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=local
+      - API_GATEWAY_PORT=3001
+      - API_GATEWAY_DB_HOST=postgres-api-gateway
+      - API_GATEWAY_DB_PORT=5432
+      - API_GATEWAY_DB_USER=defi
+      - API_GATEWAY_DB_PASSWORD=defi_password
+      - API_GATEWAY_DB_DATABASE=defi_api_gateway
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+      - CHAIN_ID=1337
+    depends_on:
+      postgres-api-gateway:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      hardhat:
+        condition: service_healthy
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Keeper Service
+  keeper:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: keeper
+    container_name: defi-keeper
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=local
+      - KEEPER_PORT=3002
+      - KEEPER_ENABLED=true
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+      - CHAIN_ID=1337
+      - PRIVATE_KEY=${PRIVATE_KEY}
+    depends_on:
+      redis:
+        condition: service_healthy
+      hardhat:
+        condition: service_healthy
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Indexer Service
+  indexer:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: indexer
+    container_name: defi-indexer
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=local
+      - INDEXER_PORT=3003
+      - INDEXER_DB_HOST=postgres-indexer
+      - INDEXER_DB_PORT=5432
+      - INDEXER_DB_USER=defi
+      - INDEXER_DB_PASSWORD=defi_password
+      - INDEXER_DB_DATABASE=defi_indexer
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - BLOCKCHAIN_RPC_URL=http://hardhat:8545
+      - CHAIN_ID=1337
+    depends_on:
+      postgres-indexer:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      hardhat:
+        condition: service_healthy
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # Analytics Service
+  analytics:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: analytics
+    container_name: defi-analytics
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=local
+      - ANALYTICS_PORT=3004
+      - ANALYTICS_DB_HOST=postgres-analytics
+      - ANALYTICS_DB_PORT=5432
+      - ANALYTICS_DB_USER=defi
+      - ANALYTICS_DB_PASSWORD=defi_password
+      - ANALYTICS_DB_DATABASE=defi_analytics
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres-analytics:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - defi-network
+    restart: unless-stopped
+
+  # ==========================================
+  # FRONTEND
+  # ==========================================
+  
+  # Frontend React application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: defi-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:3001/api/v1
+      - REACT_APP_BLOCKCHAIN_RPC=http://localhost:8545
+      - REACT_APP_CHAIN_ID=1337
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+    depends_on:
+      - api-gateway
+      - hardhat
+    networks:
+      - defi-network
+    stdin_open: true
+    tty: true
+
+networks:
+  defi-network:
+    driver: bridge
+
+volumes:
+  postgres-indexer-data:
+  postgres-analytics-data:
+  postgres-api-gateway-data:
+  redis-data:
+  hardhat-data:

@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # PostgreSQL for Indexer
+  postgres-indexer:
+    image: postgres:16-alpine
+    container_name: defi-postgres-indexer
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_indexer
+    volumes:
+      - postgres-indexer-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for Analytics
+  postgres-analytics:
+    image: postgres:16-alpine
+    container_name: defi-postgres-analytics
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_analytics
+    volumes:
+      - postgres-analytics-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for API Gateway
+  postgres-api-gateway:
+    image: postgres:16-alpine
+    container_name: defi-postgres-api-gateway
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: defi
+      POSTGRES_PASSWORD: defi_password
+      POSTGRES_DB: defi_api_gateway
+    volumes:
+      - postgres-api-gateway-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U defi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: defi-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+
+  # Hardhat local blockchain
+  hardhat:
+    build:
+      context: .
+      dockerfile: Dockerfile.hardhat
+    container_name: defi-hardhat
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./contracts:/app/contracts
+      - ./scripts:/app/scripts
+      - ./test:/app/test
+      - ./artifacts:/app/artifacts
+      - ./cache:/app/cache
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8545"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-indexer-data:
+  postgres-analytics-data:
+  postgres-api-gateway-data:
+  redis-data:
