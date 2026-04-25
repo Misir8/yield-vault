@@ -3,7 +3,8 @@ import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 
 import { DepositsService } from "./deposits.service";
 import {
-  GetDepositsByUserDTO,
+  UserAddressParamDTO,
+  PaginationQueryDTO,
   DepositResponseDTO,
   WithdrawalResponseDTO,
 } from "./dto/deposit.dto";
@@ -21,8 +22,8 @@ export class DepositsController {
     type: [DepositResponseDTO],
   })
   async getDepositsByUser(
-    @Param() params: GetDepositsByUserDTO,
-    @Query() query: GetDepositsByUserDTO,
+    @Param() params: UserAddressParamDTO,
+    @Query() query: PaginationQueryDTO,
   ) {
     return await this.depositsService.getDepositsByUser(
       params.userAddress,
@@ -38,8 +39,8 @@ export class DepositsController {
     type: [WithdrawalResponseDTO],
   })
   async getWithdrawalsByUser(
-    @Param() params: GetDepositsByUserDTO,
-    @Query() query: GetDepositsByUserDTO,
+    @Param() params: UserAddressParamDTO,
+    @Query() query: PaginationQueryDTO,
   ) {
     return await this.depositsService.getWithdrawalsByUser(
       params.userAddress,
@@ -60,7 +61,7 @@ export class DepositsController {
       },
     },
   })
-  async getTotalDeposited(@Param() params: GetDepositsByUserDTO) {
+  async getTotalDeposited(@Param() params: UserAddressParamDTO) {
     const total = await this.depositsService.getTotalDeposited(
       params.userAddress,
     );
@@ -83,7 +84,7 @@ export class DepositsController {
       },
     },
   })
-  async getTotalWithdrawn(@Param() params: GetDepositsByUserDTO) {
+  async getTotalWithdrawn(@Param() params: UserAddressParamDTO) {
     const total = await this.depositsService.getTotalWithdrawn(
       params.userAddress,
     );

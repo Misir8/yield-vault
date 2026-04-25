@@ -67,27 +67,55 @@ export class EventListenerService implements OnModuleInit {
 
   private async loadContractAbi(contractName: string): Promise<any[]> {
     try {
-      const projectRoot = path.resolve(process.cwd(), "../");
-      const artifactPath = path.join(
-        projectRoot,
-        "artifacts",
-        "contracts",
-        `${contractName}.sol`,
-        `${contractName}.json`,
-      );
+      // Try multiple possible paths
+      const possiblePaths = [
+        // From backend directory
+        path.resolve(
+          process.cwd(),
+          "../artifacts/contracts",
+          `${contractName}.sol`,
+          `${contractName}.json`,
+        ),
+        // From project root
+        path.resolve(
+          process.cwd(),
+          "artifacts/contracts",
+          `${contractName}.sol`,
+          `${contractName}.json`,
+        ),
+        // Relative to backend
+        path.resolve(
+          __dirname,
+          "../../../../../artifacts/contracts",
+          `${contractName}.sol`,
+          `${contractName}.json`,
+        ),
+      ];
+
+      let artifactPath: string | null = null;
+      for (const testPath of possiblePaths) {
+        this.logger.debug(`Checking path: ${testPath}`);
+        if (fs.existsSync(testPath)) {
+          artifactPath = testPath;
+          break;
+        }
+      }
+
+      if (!artifactPath) {
+        this.logger.error(
+          `Artifact file not found for ${contractName}. Tried paths:`,
+          possiblePaths,
+        );
+        throw new Error(`Artifact file not found: ${contractName}`);
+      }
 
       this.logger.log(`Loading ABI from: ${artifactPath}`);
-      this.logger.log(`File exists: ${fs.existsSync(artifactPath)}`);
-
-      if (!fs.existsSync(artifactPath)) {
-        throw new Error(`Artifact file not found: ${artifactPath}`);
-      }
 
       const artifactContent = fs.readFileSync(artifactPath, "utf-8");
       const artifact = JSON.parse(artifactContent);
 
       this.logger.log(
-        `Loaded ABI for ${contractName} with ${artifact.abi.length} entries`,
+        `✅ Loaded ABI for ${contractName} with ${artifact.abi.length} entries`,
       );
 
       return artifact.abi;
@@ -127,6 +155,12 @@ export class EventListenerService implements OnModuleInit {
     const toBlock = currentBlock;
 
     this.logger.log(`Indexing from block ${fromBlock} to ${toBlock}`);
+
+    // Skip if already up to date
+    if (fromBlock > toBlock) {
+      this.logger.log(`Already up to date. No blocks to index.`);
+      return;
+    }
 
     while (fromBlock <= toBlock) {
       const batchEnd = Math.min(fromBlock + INDEXER.BATCH_SIZE - 1, toBlock);
@@ -276,8 +310,15 @@ export class EventListenerService implements OnModuleInit {
       const state = await this.stateService.getState();
       const currentBlock = await this.blockchainService.getCurrentBlock();
 
-      if (state && Number(state.lastBlockNumber) < currentBlock) {
-        const fromBlock = Number(state.lastBlockNumber) + 1;
+      const lastProcessedBlock = state ? Number(state.lastBlockNumber) : -1;
+
+      this.logger.debug(
+        `Sync check: last=${lastProcessedBlock}, current=${currentBlock}`,
+      );
+
+      if (lastProcessedBlock < currentBlock) {
+        const fromBlock = lastProcessedBlock + 1;
+        this.logger.log(`Syncing new blocks: ${fromBlock} to ${currentBlock}`);
         await this.processBatch(fromBlock, currentBlock);
       }
     } catch (error) {

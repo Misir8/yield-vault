@@ -4,6 +4,8 @@ import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { LoansService } from "./loans.service";
 import {
   GetLoansByUserDTO,
+  UserAddressParamDTO,
+  PaginationQueryDTO,
   LoanResponseDTO,
   LiquidationResponseDTO,
 } from "./dto/loan.dto";
@@ -21,8 +23,8 @@ export class LoansController {
     type: [LoanResponseDTO],
   })
   async getLoansByUser(
-    @Param() params: GetLoansByUserDTO,
-    @Query() query: GetLoansByUserDTO,
+    @Param() params: UserAddressParamDTO,
+    @Query() query: PaginationQueryDTO,
   ) {
     return await this.loansService.getLoansByUser(
       params.userAddress,
@@ -37,7 +39,7 @@ export class LoansController {
     description: "List of active user loans",
     type: [LoanResponseDTO],
   })
-  async getActiveLoansByUser(@Param() params: GetLoansByUserDTO) {
+  async getActiveLoansByUser(@Param() params: UserAddressParamDTO) {
     return await this.loansService.getActiveLoansByUser(params.userAddress);
   }
 
@@ -54,7 +56,7 @@ export class LoansController {
       },
     },
   })
-  async getTotalBorrowed(@Param() params: GetLoansByUserDTO) {
+  async getTotalBorrowed(@Param() params: UserAddressParamDTO) {
     const total = await this.loansService.getTotalBorrowed(params.userAddress);
     return { userAddress: params.userAddress, totalBorrowed: total.toString() };
   }
@@ -67,8 +69,8 @@ export class LoansController {
     type: [LiquidationResponseDTO],
   })
   async getLiquidationsByBorrower(
-    @Param() params: GetLoansByUserDTO,
-    @Query() query: GetLoansByUserDTO,
+    @Param() params: UserAddressParamDTO,
+    @Query() query: PaginationQueryDTO,
   ) {
     return await this.loansService.getLiquidationsByBorrower(
       params.userAddress,

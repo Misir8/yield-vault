@@ -41,6 +41,7 @@ model Deposit {
   timestamp       DateTime
   createdAt       DateTime @default(now())
 
+  @@unique([transactionHash, user])
   @@index([user])
   @@index([blockNumber])
   @@index([timestamp])

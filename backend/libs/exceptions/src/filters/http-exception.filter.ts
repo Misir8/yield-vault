@@ -38,12 +38,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const response: Response = ctx.getResponse();
 
       if (exception instanceof ThrottlerException) {
-        response
-          .status(HttpStatus.TOO_MANY_REQUESTS)
-          .json({
-            status: HttpStatus.TOO_MANY_REQUESTS,
-            errors: new TooManyRequestsError().details,
-          });
+        response.status(HttpStatus.TOO_MANY_REQUESTS).json({
+          status: HttpStatus.TOO_MANY_REQUESTS,
+          errors: new TooManyRequestsError().details,
+        });
         return;
       }
 
@@ -76,12 +74,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 : String(exception),
             );
       if (!isAlreadyReported) this.sentryService.error(err);
-      response
-        .status(500)
-        .json({
-          status: 500,
-          errors: [{ field: "", message: INTERNAL_SERVER_ERROR }],
-        });
+      response.status(500).json({
+        status: 500,
+        errors: [{ field: "", message: INTERNAL_SERVER_ERROR }],
+      });
       return;
     }
     let error: Error | ErrorDetail;
