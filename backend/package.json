@@ -73,6 +73,7 @@
     "@sentry/nestjs": "^10.50.0",
     "amqp-connection-manager": "^4.1.14",
     "amqplib": "^0.10.3",
+    "axios-retry": "^4.5.0",
     "bull": "^4.11.5",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
@@ -136,7 +137,10 @@
       "^libs/exceptions(|/.*)$": "<rootDir>/libs/exceptions/src/$1",
       "^libs/constants(|/.*)$": "<rootDir>/libs/constants/src/$1",
       "^@libs/logger(|/.*)$": "<rootDir>/libs/logger/src/$1",
-      "^@libs/health(|/.*)$": "<rootDir>/libs/health/src/$1"
+      "^@libs/health(|/.*)$": "<rootDir>/libs/health/src/$1",
+      "^@libs/axios(|/.*)$": "<rootDir>/libs/axios/src/$1",
+      "^@libs/indexer-provider(|/.*)$": "<rootDir>/libs/indexer-provider/src/$1",
+      "^@libs/indexer-types(|/.*)$": "<rootDir>/libs/indexer-types/src/$1"
     }
   }
 }

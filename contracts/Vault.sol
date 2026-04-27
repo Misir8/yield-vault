@@ -47,6 +47,9 @@ contract Vault is Ownable, ReentrancyGuard {
     /// @notice Minimum deposit amount
     uint256 public minDepositAmount;
     
+    /// @notice Address of LendingPool (can withdraw liquidity)
+    address public lendingPool;
+    
     // ============================================
     // USER DEPOSIT STRUCTURE
     // ============================================
@@ -389,5 +392,25 @@ contract Vault is Ownable, ReentrancyGuard {
      */
     function updateMinDepositAmount(uint256 newMinAmount) external onlyOwner {
         minDepositAmount = newMinAmount;
+    }
+    
+    /**
+     * @notice Set LendingPool address
+     * @param _lendingPool Address of LendingPool contract
+     */
+    function setLendingPool(address _lendingPool) external onlyOwner {
+        require(_lendingPool != address(0), "Invalid address");
+        lendingPool = _lendingPool;
+    }
+    
+    /**
+     * @notice Transfer liquidity to borrower (called by LendingPool only)
+     * @param to Recipient address
+     * @param amount Amount to transfer
+     */
+    function transferLiquidity(address to, uint256 amount) external {
+        require(msg.sender == lendingPool, "Only LendingPool");
+        require(asset.balanceOf(address(this)) >= amount, "Insufficient liquidity");
+        asset.safeTransfer(to, amount);
     }
 }

@@ -47,41 +47,42 @@ export function useVault() {
     hash,
   });
 
-  const approve = async (amount: string) => {
+  const approve = async () => {
     if (!address) throw new Error('Wallet not connected');
     
-    // Approve max uint256 for convenience (infinite approval)
     const maxApproval = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
     
     return writeContract({
       ...stableTokenConfig,
       functionName: 'approve',
       args: [vaultConfig.address, maxApproval],
+      gas: 100000n,
     });
   };
 
   const deposit = async (amount: string) => {
     if (!address) throw new Error('Wallet not connected');
     
-    const amountBigInt = parseUnits(amount, 18);
+    const amountBigInt = parseUnits(amount, 6); // USDT has 6 decimals
     
     return writeContract({
       ...vaultConfig,
       functionName: 'deposit',
       args: [amountBigInt],
+      gas: 500000n,
     });
   };
 
-  // Withdraw
   const withdraw = async (shares: string) => {
     if (!address) throw new Error('Wallet not connected');
     
-    const sharesBigInt = parseUnits(shares, 18);
+    const sharesBigInt = parseUnits(shares, 6); // USDT has 6 decimals
     
     return writeContract({
       ...vaultConfig,
       functionName: 'withdraw',
       args: [sharesBigInt],
+      gas: 500000n,
     });
   };
 

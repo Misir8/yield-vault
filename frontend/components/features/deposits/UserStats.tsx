@@ -1,18 +1,16 @@
 'use client';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useVault } from '@/hooks/useVault';
 import { useLendingPool } from '@/hooks/useLendingPool';
 import { useDeposits } from '@/hooks/useDeposits';
-import { useLoans } from '@/hooks/useLoans';
-import { formatTokenAmount } from '@/lib/utils/format';
+import { formatUSDT } from '@/lib/utils/format';
 import { TrendingUp, Wallet, CreditCard } from 'lucide-react';
 
 export function UserStats() {
-  const { userBalance, totalAssets } = useVault();
-  const { userDebt, userCollateral } = useLendingPool();
+  const { userBalance } = useVault();
+  const { userDebt } = useLendingPool();
   const { totalDeposited, totalWithdrawn } = useDeposits();
-  const { totalBorrowed } = useLoans();
 
   const netDeposit = BigInt(totalDeposited || '0') - BigInt(totalWithdrawn || '0');
 
@@ -25,7 +23,7 @@ export function UserStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {userBalance ? formatTokenAmount(userBalance) : '0'}
+            {userBalance ? formatUSDT(userBalance) : '0'}
           </div>
           <p className="text-xs text-muted-foreground">
             Vault shares
@@ -40,7 +38,7 @@ export function UserStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {userDebt ? formatTokenAmount(userDebt) : '0'}
+            {userDebt ? formatUSDT(userDebt) : '0'}
           </div>
           <p className="text-xs text-muted-foreground">
             USDT debt
@@ -55,7 +53,7 @@ export function UserStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            {formatTokenAmount(netDeposit)}
+            {formatUSDT(netDeposit)}
           </div>
           <p className="text-xs text-muted-foreground">
             Deposits - Withdrawals

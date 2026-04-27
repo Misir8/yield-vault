@@ -1,5 +1,13 @@
 import { Controller, Get, Query, Param } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiKeyProtected } from "@libs/auth";
+import { INDEXER } from "config";
+import {
+  INDEXER_PRIVATE_EVENTS_URL,
+  INDEXER_PRIVATE_EVENTS_TYPE_URL,
+  INDEXER_PRIVATE_EVENTS_BLOCK_URL,
+  INDEXER_PRIVATE_EVENTS_TX_URL,
+} from "@libs/constants/routes";
 
 import { EventsService } from "./events.service";
 import {
@@ -10,13 +18,14 @@ import {
   EventResponseDTO,
 } from "./dto/event.dto";
 
-@ApiTags("Events")
-@Controller("events")
-export class EventsController {
+@ApiTags("Private Events")
+@Controller(INDEXER_PRIVATE_EVENTS_URL)
+@ApiKeyProtected(INDEXER.X_API_KEY)
+export class PrivateEventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  @ApiOperation({ summary: "Get recent events" })
+  @ApiOperation({ summary: "Get recent events (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of recent events",
@@ -26,8 +35,8 @@ export class EventsController {
     return await this.eventsService.getRecentEvents(query.limit);
   }
 
-  @Get("type/:eventType")
-  @ApiOperation({ summary: "Get events by type" })
+  @Get(INDEXER_PRIVATE_EVENTS_TYPE_URL)
+  @ApiOperation({ summary: "Get events by type (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of events by type",
@@ -43,8 +52,8 @@ export class EventsController {
     );
   }
 
-  @Get("block/:blockNumber")
-  @ApiOperation({ summary: "Get events by block number" })
+  @Get(INDEXER_PRIVATE_EVENTS_BLOCK_URL)
+  @ApiOperation({ summary: "Get events by block number (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of events in block",
@@ -56,8 +65,8 @@ export class EventsController {
     );
   }
 
-  @Get("tx/:transactionHash")
-  @ApiOperation({ summary: "Get events by transaction hash" })
+  @Get(INDEXER_PRIVATE_EVENTS_TX_URL)
+  @ApiOperation({ summary: "Get events by transaction hash (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of events in transaction",

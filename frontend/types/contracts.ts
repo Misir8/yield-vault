@@ -36,6 +36,16 @@ export interface Loan {
   updatedAt: string;
 }
 
+export interface Repayment {
+  id: string;
+  user: string;
+  amount: string;
+  blockNumber: string;
+  transactionHash: string;
+  timestamp: string;
+  createdAt: string;
+}
+
 export interface Event {
   id: string;
   blockNumber: string;

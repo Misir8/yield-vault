@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useLendingPool } from '@/hooks/useLendingPool';
-import { formatTokenAmount } from '@/lib/utils/format';
+import { formatUSDT } from '@/lib/utils/format';
 import { parseUnits } from 'viem';
 import { Loader2 } from 'lucide-react';
 
@@ -31,7 +31,7 @@ export function RepayForm() {
   useEffect(() => {
     if (amount && allowance !== undefined) {
       try {
-        const amountBigInt = parseUnits(amount, 18);
+        const amountBigInt = parseUnits(amount, 6); // USDT 6 decimals
         setTimeout(() => {
           setNeedsApproval(allowance < amountBigInt);
         }, 0);
@@ -82,9 +82,8 @@ export function RepayForm() {
 
   const handleMaxClick = () => {
     if (userDebt && tokenBalance) {
-      // Max = min(debt, balance)
       const maxAmount = userDebt < tokenBalance ? userDebt : tokenBalance;
-      setAmount(formatTokenAmount(maxAmount));
+      setAmount(formatUSDT(maxAmount));
     }
   };
 
@@ -121,14 +120,14 @@ export function RepayForm() {
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Current Debt:</span>
           <span className="font-medium text-red-600">
-            {userDebt ? formatTokenAmount(userDebt) : '0'} USDT
+            {userDebt ? formatUSDT(userDebt) : '0'} USDT
           </span>
         </div>
 
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Available Balance:</span>
           <span className="font-medium">
-            {tokenBalance ? formatTokenAmount(tokenBalance) : '0'} USDT
+            {tokenBalance ? formatUSDT(tokenBalance) : '0'} USDT
           </span>
         </div>
 

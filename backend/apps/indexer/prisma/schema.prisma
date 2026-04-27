@@ -66,6 +66,22 @@ model Withdrawal {
   @@map("withdrawals")
 }
 
+// Repayments
+model Repayment {
+  id              String   @id @default(uuid())
+  user            String   // Ethereum address
+  amount          String   // BigInt as string
+  blockNumber     BigInt
+  transactionHash String
+  timestamp       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([user])
+  @@index([blockNumber])
+  @@index([timestamp])
+  @@map("repayments")
+}
+
 // Loans
 model Loan {
   id              String   @id @default(uuid())

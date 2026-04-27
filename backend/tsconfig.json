@@ -69,6 +69,12 @@
       "@libs/health/*": [
         "libs/health/src/*"
       ],
+      "@libs/auth": [
+        "libs/auth/src"
+      ],
+      "@libs/auth/*": [
+        "libs/auth/src/*"
+      ],
       "libs/exceptions": [
         "libs/exceptions/src"
       ],
@@ -81,6 +87,24 @@
       "libs/constants/*": [
         "libs/constants/src/*"
       ],
+      "@libs/axios": [
+        "libs/axios/src"
+      ],
+      "@libs/axios/*": [
+        "libs/axios/src/*"
+      ],
+      "@libs/indexer-provider": [
+        "libs/indexer-provider/src"
+      ],
+      "@libs/indexer-provider/*": [
+        "libs/indexer-provider/src/*"
+      ],
+      "@libs/indexer-types": [
+        "libs/indexer-types/src"
+      ],
+      "@libs/indexer-types/*": [
+        "libs/indexer-types/src/*"
+      ]
     }
   }
 }

@@ -1,0 +1,21 @@
+{
+  "name": "@app/auth",
+  "version": "1.0.0",
+  "description": "Authentication and authorization library for DeFi Yield Vault",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "auth",
+    "api-key",
+    "nestjs",
+    "guard"
+  ],
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/swagger": "^7.0.0"
+  }
+}

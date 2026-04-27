@@ -10,6 +10,9 @@ import { ExceptionsModule } from "@libs/exceptions";
 import { HealthModule } from "@libs/health";
 
 import { apiGatewayDatabaseConfig } from "./database.config";
+import { DepositsModule } from "./deposits";
+import { LoansModule } from "./loans";
+import { EventsModule } from "./events";
 
 @Module({
   imports: [
@@ -24,6 +27,10 @@ import { apiGatewayDatabaseConfig } from "./database.config";
         },
       ],
     }),
+    // Indexer endpoints
+    DepositsModule,
+    LoansModule,
+    EventsModule,
   ],
 })
 export class ApiGatewayModule {}

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useVault } from '@/hooks/useVault';
-import { formatTokenAmount } from '@/lib/utils/format';
+import { formatUSDT } from '@/lib/utils/format';
 import { parseUnits } from 'viem';
 import { Loader2 } from 'lucide-react';
 
@@ -62,7 +62,7 @@ export function DepositForm() {
   const handleApprove = async () => {
     try {
       setLastAction('approve');
-      await approve(amount);
+      await approve();
     } catch (err) {
       console.error('Approve failed:', err);
       setLastAction(null);
@@ -81,7 +81,7 @@ export function DepositForm() {
 
   const handleMaxClick = () => {
     if (tokenBalance) {
-      setAmount(formatTokenAmount(tokenBalance));
+      setAmount(formatUSDT(tokenBalance));
     }
   };
 
@@ -101,7 +101,7 @@ export function DepositForm() {
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Available Balance:</span>
           <span className="font-medium">
-            {tokenBalance ? formatTokenAmount(tokenBalance) : '0'} USDT
+            {tokenBalance ? formatUSDT(tokenBalance) : '0'} USDT
           </span>
         </div>
 

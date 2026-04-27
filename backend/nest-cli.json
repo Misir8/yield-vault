@@ -84,6 +84,33 @@
       "compilerOptions": {
         "tsConfigPath": "libs/health/tsconfig.lib.json"
       }
+    },
+    "axios": {
+      "type": "library",
+      "root": "libs/axios",
+      "entryFile": "index",
+      "sourceRoot": "libs/axios/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/axios/tsconfig.lib.json"
+      }
+    },
+    "indexer-provider": {
+      "type": "library",
+      "root": "libs/indexer-provider",
+      "entryFile": "index",
+      "sourceRoot": "libs/indexer-provider/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/indexer-provider/tsconfig.lib.json"
+      }
+    },
+    "indexer-types": {
+      "type": "library",
+      "root": "libs/indexer-types",
+      "entryFile": "index",
+      "sourceRoot": "libs/indexer-types/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/indexer-types/tsconfig.lib.json"
+      }
     }
   },
   "compilerOptions": {

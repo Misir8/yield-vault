@@ -11,27 +11,16 @@ import { HealthModule } from "@libs/health";
 
 import { indexerDatabaseConfig } from "./database.config";
 
-// Blockchain
-import { BlockchainService } from "./blockchain/blockchain.service";
-import { EventListenerService } from "./blockchain/event-listener.service";
-
-// State
-import { StateService } from "./state/state.service";
-
-// Events
-import { EventsService } from "./events/events.service";
-import { EventsController } from "./events/events.controller";
-
-// Deposits
-import { DepositsService } from "./deposits/deposits.service";
-import { DepositsController } from "./deposits/deposits.controller";
-
-// Loans
-import { LoansService } from "./loans/loans.service";
-import { LoansController } from "./loans/loans.controller";
+// Feature Modules
+import { BlockchainModule } from "./blockchain";
+import { StateModule } from "./state";
+import { EventsModule } from "./events";
+import { DepositsModule } from "./deposits";
+import { LoansModule } from "./loans";
 
 @Module({
   imports: [
+    // Infrastructure
     DatabaseModule.forRoot(INDEXER_DB.NAME, indexerDatabaseConfig),
     ExceptionsModule.forRoot({ serverName: SERVICES.INDEXER }),
     HealthModule,
@@ -44,15 +33,14 @@ import { LoansController } from "./loans/loans.controller";
         },
       ],
     }),
+    // Feature modules
+    StateModule,
+    EventsModule,
+    DepositsModule,
+    LoansModule,
+    BlockchainModule, // Last because it depends on others
   ],
-  controllers: [EventsController, DepositsController, LoansController],
-  providers: [
-    BlockchainService,
-    EventListenerService,
-    StateService,
-    EventsService,
-    DepositsService,
-    LoansService,
-  ],
+  controllers: [],
+  providers: [],
 })
 export class IndexerModule {}

@@ -1,5 +1,14 @@
 import { Controller, Get, Param, Query } from "@nestjs/common";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import { ApiKeyProtected } from "@libs/auth";
+import { INDEXER } from "config";
+import {
+  INDEXER_PRIVATE_DEPOSITS_URL,
+  INDEXER_PRIVATE_DEPOSITS_USER_URL,
+  INDEXER_PRIVATE_DEPOSITS_USER_WITHDRAWALS_URL,
+  INDEXER_PRIVATE_DEPOSITS_USER_TOTAL_DEPOSITED_URL,
+  INDEXER_PRIVATE_DEPOSITS_USER_TOTAL_WITHDRAWN_URL,
+} from "@libs/constants/routes";
 
 import { DepositsService } from "./deposits.service";
 import {
@@ -9,13 +18,14 @@ import {
   WithdrawalResponseDTO,
 } from "./dto/deposit.dto";
 
-@ApiTags("Deposits")
-@Controller("deposits")
-export class DepositsController {
+@ApiTags("Private Deposits")
+@Controller(INDEXER_PRIVATE_DEPOSITS_URL)
+@ApiKeyProtected(INDEXER.X_API_KEY)
+export class PrivateDepositsController {
   constructor(private readonly depositsService: DepositsService) {}
 
-  @Get("user/:userAddress")
-  @ApiOperation({ summary: "Get deposits by user address" })
+  @Get(INDEXER_PRIVATE_DEPOSITS_USER_URL)
+  @ApiOperation({ summary: "Get deposits by user address (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of user deposits",
@@ -31,8 +41,8 @@ export class DepositsController {
     );
   }
 
-  @Get("user/:userAddress/withdrawals")
-  @ApiOperation({ summary: "Get withdrawals by user address" })
+  @Get(INDEXER_PRIVATE_DEPOSITS_USER_WITHDRAWALS_URL)
+  @ApiOperation({ summary: "Get withdrawals by user address (Private)" })
   @ApiResponse({
     status: 200,
     description: "List of user withdrawals",
@@ -48,8 +58,8 @@ export class DepositsController {
     );
   }
 
-  @Get("user/:userAddress/total-deposited")
-  @ApiOperation({ summary: "Get total deposited by user" })
+  @Get(INDEXER_PRIVATE_DEPOSITS_USER_TOTAL_DEPOSITED_URL)
+  @ApiOperation({ summary: "Get total deposited by user (Private)" })
   @ApiResponse({
     status: 200,
     description: "Total deposited amount",
@@ -71,8 +81,8 @@ export class DepositsController {
     };
   }
 
-  @Get("user/:userAddress/total-withdrawn")
-  @ApiOperation({ summary: "Get total withdrawn by user" })
+  @Get(INDEXER_PRIVATE_DEPOSITS_USER_TOTAL_WITHDRAWN_URL)
+  @ApiOperation({ summary: "Get total withdrawn by user (Private)" })
   @ApiResponse({
     status: 200,
     description: "Total withdrawn amount",

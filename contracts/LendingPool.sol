@@ -109,8 +109,7 @@ contract LendingPool is Ownable, ReentrancyGuard {
         require(healthFactor >= MIN_HEALTH_FACTOR, "Health factor too low");
         
         // Withdraw from vault and transfer to user
-        vault.withdraw(amount);
-        asset.safeTransfer(msg.sender, amount);
+        vault.transferLiquidity(msg.sender, amount);
         
         emit Borrowed(msg.sender, amount, collateralAmount);
     }
@@ -129,12 +128,8 @@ contract LendingPool is Ownable, ReentrancyGuard {
         uint256 currentDebt = _calculateDebt(position.principal, position.borrowIndex, globalBorrowIndex);
         uint256 repayAmount = amount > currentDebt ? currentDebt : amount;
         
-        // Transfer tokens from user
-        asset.safeTransferFrom(msg.sender, address(this), repayAmount);
-        
-        // Deposit back to vault
-        asset.approve(address(vault), repayAmount);
-        vault.deposit(repayAmount);
+        // Transfer tokens from user and return to vault
+        asset.safeTransferFrom(msg.sender, address(vault), repayAmount);
         
         // Update position
         uint256 newDebt = currentDebt - repayAmount;
@@ -206,7 +201,7 @@ contract LendingPool is Ownable, ReentrancyGuard {
      * @notice Get health factor for user
      * @return Health factor scaled by 1e18 (1e18 = 1.0)
      */
-    function getHealthFactor(address user) public returns (uint256) {
+    function getHealthFactor(address user) public view returns (uint256) {
         BorrowPosition memory position = borrowPositions[user];
         if (position.principal == 0) return type(uint256).max;
         
@@ -215,8 +210,9 @@ contract LendingPool is Ownable, ReentrancyGuard {
         
         if (currentDebt == 0) return type(uint256).max;
         
-        // Health factor = (collateral × liquidationThreshold) / debt
-        return (collateralValue * LIQUIDATION_THRESHOLD) / (currentDebt * 10000);
+        // Health factor = (collateral × liquidationThreshold × 1e18) / (debt × 10000)
+        // Scaled by 1e18 so that 1.0 = 1e18
+        return (collateralValue * LIQUIDATION_THRESHOLD * 10**18) / (currentDebt * 10000);
     }
     
     /**
@@ -299,14 +295,15 @@ contract LendingPool is Ownable, ReentrancyGuard {
         }
     }
     
-    function _getCollateralValue(address user) internal returns (uint256) {
+    function _getCollateralValue(address user) internal view returns (uint256) {
         address[] memory tokens = collateralRegistry.getUserCollateralTokens(user);
         uint256 totalValue = 0;
         
         for (uint i = 0; i < tokens.length; i++) {
             uint256 amount = collateralRegistry.getUserCollateral(user, tokens[i]);
-            uint256 price = oracleManager.getAssetPrice(tokens[i]);
-            totalValue += amount * price / 1e18;
+            uint256 price = oracleManager.getAssetPriceView(tokens[i]);
+            // result: 18 + 8 - 18 - 8 = 0 decimals → normalize to 6 (USDT decimals)
+            totalValue += (amount * price) / (1e18 * 1e2);
         }
         
         return totalValue;

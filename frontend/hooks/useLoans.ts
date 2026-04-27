@@ -17,6 +17,12 @@ export function useLoans() {
     enabled: !!address,
   });
 
+  const { data: repayments, isLoading: isLoadingRepayments, refetch: refetchRepayments } = useQuery({
+    queryKey: ['repayments', address],
+    queryFn: () => address ? indexerAPI.getRepaymentsByUser(address) : Promise.resolve([]),
+    enabled: !!address,
+  });
+
   const { data: totalBorrowed } = useQuery({
     queryKey: ['totalBorrowed', address],
     queryFn: () => address ? indexerAPI.getTotalBorrowed(address) : Promise.resolve({ userAddress: '', totalBorrowed: '0' }),
@@ -26,9 +32,11 @@ export function useLoans() {
   return {
     loans: loans || [],
     activeLoans: activeLoans || [],
+    repayments: repayments || [],
     totalBorrowed: totalBorrowed?.totalBorrowed || '0',
-    isLoading: isLoadingLoans || isLoadingActiveLoans,
+    isLoading: isLoadingLoans || isLoadingActiveLoans || isLoadingRepayments,
     refetchLoans,
     refetchActiveLoans,
+    refetchRepayments,
   };
 }

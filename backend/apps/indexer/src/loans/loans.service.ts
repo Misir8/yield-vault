@@ -45,7 +45,18 @@ export class LoansService {
 
   async handleRepay(args: ethers.Result, log: ethers.Log, block: ethers.Block) {
     try {
-      // Find the active loan for this user
+      // Save repayment record
+      await this.prisma.repayment.create({
+        data: {
+          user: args.user.toLowerCase(),
+          amount: args.amount.toString(),
+          blockNumber: BigInt(log.blockNumber),
+          transactionHash: log.transactionHash,
+          timestamp: new Date(block.timestamp * 1000),
+        },
+      });
+
+      // Find the active loan for this user and update status
       const activeLoan = await this.prisma.loan.findFirst({
         where: {
           user: args.user.toLowerCase(),
@@ -62,7 +73,6 @@ export class LoansService {
             repaidAt: new Date(block.timestamp * 1000),
           },
         });
-
         this.logger.log(
           `Loan repaid: ${activeLoan.user} - ${activeLoan.amount}`,
         );
@@ -127,6 +137,19 @@ export class LoansService {
       );
       throw error;
     }
+  }
+
+  async getRepaymentsByUser(userAddress: string, limit: number = 100) {
+    const repayments = await this.prisma.repayment.findMany({
+      where: { user: userAddress.toLowerCase() },
+      orderBy: { timestamp: "desc" },
+      take: limit,
+    });
+
+    return repayments.map((r) => ({
+      ...r,
+      blockNumber: r.blockNumber.toString(),
+    }));
   }
 
   async getLoansByUser(userAddress: string, limit: number = 100) {

@@ -8,17 +8,17 @@ async function main() {
   // Ваш адрес
   const targetAddress = "0xbbbEe6E7922fB8044600C92EABe9818a71b67a64";
   
-  // Адрес контракта MockStableToken
-  const stableTokenAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  // Адрес контракта MockStableToken (обновлен после передеплоя)
+  const stableTokenAddress = "0xe70f935c32dA4dB13e7876795f1e175465e6458e";
   
   // Подключаемся к контракту
   const MockStableToken = await hre.ethers.getContractFactory("MockStableToken");
   const stableToken = MockStableToken.attach(stableTokenAddress);
   
-  // Минтим 100,000 USDT
-  const mintAmount = hre.ethers.parseUnits("100000", 18);
+  // Минтим 100,000 USDT (6 decimals для USDT)
+  const mintAmount = hre.ethers.parseUnits("100000", 6);
   
-  console.log(`Minting ${hre.ethers.formatUnits(mintAmount, 18)} USDT to ${targetAddress}...`);
+  console.log(`Minting ${hre.ethers.formatUnits(mintAmount, 6)} USDT to ${targetAddress}...`);
   
   const tx = await stableToken.connect(deployer).mint(targetAddress, mintAmount);
   await tx.wait();
@@ -28,7 +28,7 @@ async function main() {
   
   console.log(`✅ Success!`);
   console.log(`   Transaction: ${tx.hash}`);
-  console.log(`   New balance: ${hre.ethers.formatUnits(balance, 18)} USDT`);
+  console.log(`   New balance: ${hre.ethers.formatUnits(balance, 6)} USDT`);
 }
 
 main()

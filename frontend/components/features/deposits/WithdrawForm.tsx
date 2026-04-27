@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useVault } from '@/hooks/useVault';
-import { formatTokenAmount } from '@/lib/utils/format';
+import { formatUSDT } from '@/lib/utils/format';
 import { Loader2 } from 'lucide-react';
 
 export function WithdrawForm() {
@@ -40,7 +40,7 @@ export function WithdrawForm() {
 
   const handleMaxClick = () => {
     if (userBalance) {
-      setShares(formatTokenAmount(userBalance));
+      setShares(formatUSDT(userBalance));
     }
   };
 
@@ -60,7 +60,7 @@ export function WithdrawForm() {
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Your Shares:</span>
           <span className="font-medium">
-            {userBalance ? formatTokenAmount(userBalance) : '0'} shares
+            {userBalance ? formatUSDT(userBalance) : '0'} shares
           </span>
         </div>
 

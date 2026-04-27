@@ -65,6 +65,37 @@ contract OracleManager is Ownable {
      * @return price Price scaled to 18 decimals
      */
     function getAssetPrice(address asset) external returns (uint256) {
+        uint256 price = _getPrice(asset);
+        
+        // Check TWAP deviation and emit event if attack detected
+        uint256 twap = getTWAP(asset, TWAP_PERIOD);
+        if (twap > 0) {
+            uint256 twapDeviation = _calculateDeviation(price, twap);
+            if (twapDeviation > MAX_PRICE_DEVIATION * 2) {
+                emit AttackDetected(asset, price, twap);
+            }
+        }
+        
+        // Update history
+        _updatePriceHistory(asset, price);
+        
+        emit PriceUpdated(asset, price, block.timestamp);
+        
+        return price;
+    }
+    
+    /**
+     * @notice Get asset price (view function, doesn't update history)
+     * @return price Price scaled to 18 decimals
+     */
+    function getAssetPriceView(address asset) external view returns (uint256) {
+        return _getPrice(asset);
+    }
+    
+    /**
+     * @notice Internal function to get price with validation
+     */
+    function _getPrice(address asset) internal view returns (uint256) {
         AggregatorV3Interface[] memory feeds = priceFeeds[asset];
         require(feeds.length >= MIN_ORACLES, "Not enough oracles");
         
@@ -94,15 +125,9 @@ contract OracleManager is Ownable {
         if (twap > 0) {
             uint256 twapDeviation = _calculateDeviation(medianPrice, twap);
             if (twapDeviation > MAX_PRICE_DEVIATION * 2) {
-                emit AttackDetected(asset, medianPrice, twap);
                 revert("TWAP deviation too high");
             }
         }
-        
-        // Update history
-        _updatePriceHistory(asset, medianPrice);
-        
-        emit PriceUpdated(asset, medianPrice, block.timestamp);
         
         return medianPrice;
     }

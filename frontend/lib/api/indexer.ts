@@ -1,9 +1,10 @@
 import { APIClient } from './client';
-import { Deposit, Withdrawal, Loan, Event } from '@/types';
+import { Deposit, Withdrawal, Loan, Repayment, Event } from '@/types';
 
 class IndexerAPIClient extends APIClient {
   constructor() {
-    super(process.env.NEXT_PUBLIC_INDEXER_URL || 'http://localhost:3003/api/v1/indexer');
+    // Use API Gateway instead of direct Indexer access
+    super(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1');
   }
 
   // Deposits
@@ -68,6 +69,16 @@ class IndexerAPIClient extends APIClient {
     }
   }
 
+  async getRepaymentsByUser(address: string, limit: number = 100): Promise<Repayment[]> {
+    try {
+      const normalizedAddress = address.toLowerCase();
+      return await this.get<Repayment[]>(`/loans/user/${normalizedAddress}/repayments?limit=${limit}`);
+    } catch (error) {
+      console.warn('Failed to fetch repayments:', error);
+      return [];
+    }
+  }
+
   async getTotalBorrowed(address: string): Promise<{ userAddress: string; totalBorrowed: string }> {
     try {
       const normalizedAddress = address.toLowerCase();
@@ -89,7 +100,7 @@ class IndexerAPIClient extends APIClient {
 
   async getEventsByTransaction(txHash: string): Promise<Event[]> {
     const normalizedTxHash = txHash.toLowerCase();
-    return this.get<Event[]>(`/events/tx/${normalizedTxHash}`);
+    return this.get<Event[]>(`/events/transaction/${normalizedTxHash}`);
   }
 }
 
