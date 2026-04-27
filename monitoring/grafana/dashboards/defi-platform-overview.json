@@ -1,0 +1,499 @@
+{
+  "title": "DeFi Platform - Production Overview",
+  "uid": "defi-overview",
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "service",
+        "type": "query",
+        "datasource": {"type": "prometheus", "uid": "prometheus"},
+        "query": "label_values(up, job)",
+        "current": {"text": "All", "value": "$__all"},
+        "includeAll": true,
+        "multi": true,
+        "refresh": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "type": "row",
+      "title": "Service Health",
+      "collapsed": false
+    },
+    {
+      "id": 2,
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 1},
+      "type": "stat",
+      "title": "Services Up",
+      "targets": [
+        {
+          "expr": "count(up{job=~\"$service\"} == 1)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "red"},
+              {"value": 1, "color": "yellow"},
+              {"value": 4, "color": "green"}
+            ]
+          }
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 3,
+      "gridPos": {"h": 4, "w": 6, "x": 6, "y": 1},
+      "type": "stat",
+      "title": "Total Requests (1h)",
+      "targets": [
+        {
+          "expr": "sum(increase(API_GATEWAY_http_requests_total[1h]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "blue"}
+            ]
+          }
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 4,
+      "gridPos": {"h": 4, "w": 6, "x": 12, "y": 1},
+      "type": "stat",
+      "title": "Error Rate %",
+      "targets": [
+        {
+          "expr": "100 * sum(rate(API_GATEWAY_http_requests_total{status=~\"5..\"}[5m])) / sum(rate(API_GATEWAY_http_requests_total[5m]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "decimals": 2,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 1, "color": "yellow"},
+              {"value": 5, "color": "red"}
+            ]
+          }
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 5,
+      "gridPos": {"h": 4, "w": 6, "x": 18, "y": 1},
+      "type": "stat",
+      "title": "Avg Response Time",
+      "targets": [
+        {
+          "expr": "1000 * (rate(API_GATEWAY_http_request_duration_seconds_sum[5m]) / rate(API_GATEWAY_http_request_duration_seconds_count[5m]))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 0,
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 200, "color": "yellow"},
+              {"value": 500, "color": "red"}
+            ]
+          }
+        }
+      },
+      "options": {
+        "textMode": "value_and_name",
+        "colorMode": "background",
+        "graphMode": "area"
+      }
+    },
+    {
+      "id": 10,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 5},
+      "type": "row",
+      "title": "HTTP Traffic",
+      "collapsed": false
+    },
+    {
+      "id": 11,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "type": "timeseries",
+      "title": "Request Rate (req/s)",
+      "targets": [
+        {
+          "expr": "sum(rate(API_GATEWAY_http_requests_total[1m])) by (method, status)",
+          "refId": "A",
+          "legendFormat": "{{method}} - {{status}}"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "id": 12,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "type": "timeseries",
+      "title": "Response Time Percentiles",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(API_GATEWAY_http_request_duration_seconds_bucket[1m])) by (le)) * 1000",
+          "refId": "A",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(API_GATEWAY_http_request_duration_seconds_bucket[1m])) by (le)) * 1000",
+          "refId": "B",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(API_GATEWAY_http_request_duration_seconds_bucket[1m])) by (le)) * 1000",
+          "refId": "C",
+          "legendFormat": "p99"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "id": 13,
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 14},
+      "type": "timeseries",
+      "title": "Requests by Endpoint",
+      "targets": [
+        {
+          "expr": "sum(rate(API_GATEWAY_http_requests_total[1m])) by (route)",
+          "refId": "A",
+          "legendFormat": "{{route}}"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "right", "calcs": ["mean", "max", "last"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 1, "stacking": {"mode": "normal"}}
+        }
+      }
+    },
+    {
+      "id": 20,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 22},
+      "type": "row",
+      "title": "System Resources",
+      "collapsed": false
+    },
+    {
+      "id": 21,
+      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 23},
+      "type": "timeseries",
+      "title": "CPU Usage %",
+      "targets": [
+        {
+          "expr": "rate(API_GATEWAY_process_cpu_seconds_total[1m]) * 100",
+          "refId": "A",
+          "legendFormat": "API Gateway"
+        },
+        {
+          "expr": "rate(keeper_process_cpu_seconds_total[1m]) * 100",
+          "refId": "B",
+          "legendFormat": "Keeper"
+        },
+        {
+          "expr": "rate(indexer_process_cpu_seconds_total[1m]) * 100",
+          "refId": "C",
+          "legendFormat": "Indexer"
+        },
+        {
+          "expr": "rate(analytics_process_cpu_seconds_total[1m]) * 100",
+          "refId": "D",
+          "legendFormat": "Analytics"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 70, "color": "yellow"},
+              {"value": 85, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 22,
+      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 23},
+      "type": "timeseries",
+      "title": "Memory Usage (MB)",
+      "targets": [
+        {
+          "expr": "API_GATEWAY_process_resident_memory_bytes / 1024 / 1024",
+          "refId": "A",
+          "legendFormat": "API Gateway"
+        },
+        {
+          "expr": "keeper_process_resident_memory_bytes / 1024 / 1024",
+          "refId": "B",
+          "legendFormat": "Keeper"
+        },
+        {
+          "expr": "indexer_process_resident_memory_bytes / 1024 / 1024",
+          "refId": "C",
+          "legendFormat": "Indexer"
+        },
+        {
+          "expr": "analytics_process_resident_memory_bytes / 1024 / 1024",
+          "refId": "D",
+          "legendFormat": "Analytics"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "decmbytes",
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "id": 23,
+      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 23},
+      "type": "timeseries",
+      "title": "Event Loop Lag (ms)",
+      "targets": [
+        {
+          "expr": "API_GATEWAY_nodejs_eventloop_lag_mean_seconds * 1000",
+          "refId": "A",
+          "legendFormat": "API Gateway"
+        },
+        {
+          "expr": "keeper_nodejs_eventloop_lag_mean_seconds * 1000",
+          "refId": "B",
+          "legendFormat": "Keeper"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2},
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {"value": 0, "color": "green"},
+              {"value": 50, "color": "yellow"},
+              {"value": 100, "color": "red"}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 30,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 30},
+      "type": "row",
+      "title": "Business Metrics",
+      "collapsed": false
+    },
+    {
+      "id": 31,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 31},
+      "type": "timeseries",
+      "title": "Keeper Operations",
+      "targets": [
+        {
+          "expr": "rate(keeper_rebalance_total[5m])",
+          "refId": "A",
+          "legendFormat": "Rebalances"
+        },
+        {
+          "expr": "rate(keeper_liquidation_total[5m])",
+          "refId": "B",
+          "legendFormat": "Liquidations"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["mean", "max", "last"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "id": 32,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 31},
+      "type": "timeseries",
+      "title": "Indexer Progress",
+      "targets": [
+        {
+          "expr": "indexer_current_block",
+          "refId": "A",
+          "legendFormat": "Current Block"
+        },
+        {
+          "expr": "indexer_lag_blocks",
+          "refId": "B",
+          "legendFormat": "Lag (blocks)"
+        }
+      ],
+      "options": {
+        "legend": {"displayMode": "table", "placement": "bottom", "calcs": ["last"]}
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {"drawStyle": "line", "fillOpacity": 10, "lineWidth": 2}
+        }
+      }
+    },
+    {
+      "id": 40,
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 39},
+      "type": "row",
+      "title": "Application Logs",
+      "collapsed": false
+    },
+    {
+      "id": 41,
+      "gridPos": {"h": 10, "w": 24, "x": 0, "y": 40},
+      "type": "logs",
+      "title": "Recent Logs",
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "expr": "{service=~\"api-gateway|keeper|indexer|analytics\"} != ``",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 42,
+      "gridPos": {"h": 10, "w": 12, "x": 0, "y": 50},
+      "type": "logs",
+      "title": "Error Logs",
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "expr": "{service=~\"api-gateway|keeper|indexer|analytics\"} | json | level=~\"error|ERROR\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": true,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    },
+    {
+      "id": 43,
+      "gridPos": {"h": 10, "w": 12, "x": 12, "y": 50},
+      "type": "logs",
+      "title": "HTTP Request Logs",
+      "datasource": {"type": "loki", "uid": "loki"},
+      "targets": [
+        {
+          "expr": "{service=\"api-gateway\"} | json | msg=~\"HTTP.+\"",
+          "refId": "A"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": false,
+        "enableLogDetails": true,
+        "dedupStrategy": "none",
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'defi-platform'
+    environment: 'local'
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Gateway metrics
+  - job_name: 'api-gateway'
+    metrics_path: '/api/v1/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3001']
+        labels:
+          service: 'api-gateway'
+          app: 'defi-platform'
+
+  # Keeper service metrics
+  - job_name: 'keeper'
+    metrics_path: '/api/v1/keeper/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3002']
+        labels:
+          service: 'keeper'
+          app: 'defi-platform'
+
+  # Indexer service metrics
+  - job_name: 'indexer'
+    metrics_path: '/api/v1/indexer/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3003']
+        labels:
+          service: 'indexer'
+          app: 'defi-platform'
+
+  # Analytics service metrics
+  - job_name: 'analytics'
+    metrics_path: '/api/v1/analytics/metrics'
+    static_configs:
+      - targets: ['host.docker.internal:3004']
+        labels:
+          service: 'analytics'
+          app: 'defi-platform'

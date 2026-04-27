@@ -112,20 +112,9 @@ export async function bootstrap(
     }
 
     if (isAppWithMetrics) {
-      const metricsConfig = {
-        ...opts.monitoring,
-        appLabel: service,
-        metrics: [
-          ...serviceMetrics.default,
-          ...(serviceMetrics[service.toLowerCase()] || []),
-        ],
-      };
-
-      const MetricsAppModule = createMetricsModule(metricsConfig);
-      const metricsApp = await NestFactory.create(MetricsAppModule);
-      await metricsApp.listen(opts.monitoring?.config?.EXPOSE_PORT || 9090);
-      const metricsUrl = await metricsApp.getUrl();
-      logger.log(`${service} Metrics available at ${metricsUrl}/metrics`);
+      logger.log(
+        `${service} Metrics available at http://localhost:${port}${path}/metrics`,
+      );
     }
 
     app.useGlobalPipes(new ClassValidationPipe());
@@ -135,7 +124,6 @@ export async function bootstrap(
   } catch (error) {
     logger.error(`Failed to start ${service}: ${error?.message || error}`);
     try {
-      // Capture bootstrap errors in Sentry
       sentryService.error(error as Error, { phase: "bootstrap", service }, [
         "bootstrap",
         "fatal",

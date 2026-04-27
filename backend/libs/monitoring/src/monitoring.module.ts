@@ -1,49 +1,76 @@
 /**
  * Monitoring module for metrics and health checks
- * Simplified version without complex Prometheus integration
+ * Full Prometheus integration with prom-client
  */
 import { Module, DynamicModule, Global } from "@nestjs/common";
+import { APP_INTERCEPTOR } from "@nestjs/core";
 import { MonitoringConfig } from "./monitoring.types";
+import { PrometheusService } from "./prometheus.service";
+import { HttpMetricsInterceptor } from "./http-metrics.interceptor";
+import { MetricsController } from "./metrics.controller";
 
+/**
+ * Global Monitoring Module
+ */
 @Global()
 @Module({})
 export class MonitoringModule {
   static forRoot(config: MonitoringConfig): DynamicModule {
+    const prometheusServiceProvider = {
+      provide: PrometheusService,
+      useFactory: () => new PrometheusService(config),
+    };
+
     return {
       module: MonitoringModule,
       providers: [
+        prometheusServiceProvider,
+        HttpMetricsInterceptor,
         {
           provide: "MONITORING_CONFIG",
           useValue: config,
         },
+        {
+          provide: APP_INTERCEPTOR,
+          useClass: HttpMetricsInterceptor,
+        },
       ],
-      exports: ["MONITORING_CONFIG"],
+      exports: [PrometheusService, HttpMetricsInterceptor, "MONITORING_CONFIG"],
     };
   }
 }
 
 /**
  * Wrap application module with monitoring
- * This is a placeholder for future Prometheus integration
+ * Adds HTTP metrics interceptor and MetricsController to the application
  */
 export function wrapApplicationWithMonitoringModule(
   AppModule: any,
   serviceName: string,
   config: MonitoringConfig,
 ): any {
-  // For now, just return the original module
-  // In future, this will wrap with Prometheus metrics
-  return AppModule;
+  @Module({
+    imports: [AppModule, MonitoringModule.forRoot(config)],
+    controllers: [MetricsController],
+  })
+  class MonitoredAppModule {}
+
+  return MonitoredAppModule;
 }
 
 /**
  * Create metrics module for exposing /metrics endpoint
- * This is a placeholder for future Prometheus integration
+ * This creates a separate NestJS application for metrics
  */
 export function createMetricsModule(config: MonitoringConfig): any {
+  const prometheusServiceProvider = {
+    provide: PrometheusService,
+    useFactory: () => new PrometheusService(config),
+  };
+
   @Module({
-    controllers: [],
-    providers: [],
+    controllers: [MetricsController],
+    providers: [prometheusServiceProvider],
   })
   class MetricsModule {}
 

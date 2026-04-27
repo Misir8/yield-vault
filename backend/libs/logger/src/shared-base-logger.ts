@@ -3,15 +3,18 @@
  * Shared base Winston logger (singleton per process).
  *
  * Simplified version without CloudWatch dependency.
- * Uses console and file transports only.
+ * Uses console, file, and Loki transports.
  */
 import { hostname } from "node:os";
 import { styleText } from "node:util";
 
-import { LOGGING } from "config";
+import { LOGGING, METRICS } from "config";
 import { createLogger, format, transports, Logger } from "winston";
 
 import { RequestContext } from "./request-context";
+
+// Use require for winston-loki due to module compatibility
+const LokiTransport = require("winston-loki");
 
 type TLogLevel = "verbose" | "debug" | "info" | "warn" | "error";
 type Colorizer = (text: string) => string;
@@ -159,6 +162,30 @@ export function getOrCreateBaseLogger(): Logger {
         format: format.json(),
         maxsize: 10 * 1024 * 1024, // 10MB
         maxFiles: 5,
+      }),
+    );
+  }
+
+  // Add Loki transport if metrics are enabled
+  if (METRICS?.ENABLED) {
+    const lokiHost = process.env.LOKI_HOST || "localhost";
+    const lokiPort = process.env.LOKI_PORT || "3100";
+
+    logTransports.push(
+      new LokiTransport({
+        host: `http://${lokiHost}:${lokiPort}`,
+        level: logLevel, // Use same level as console
+        labels: {
+          service: serviceName,
+          environment: process.env.NODE_ENV || "development",
+          hostname: hostname(),
+        },
+        json: true,
+        format: format.json(),
+        replaceTimestamp: true,
+        onConnectionError: (err: Error) => {
+          console.error("Loki connection error:", err.message);
+        },
       }),
     );
   }

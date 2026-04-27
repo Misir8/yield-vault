@@ -85,11 +85,13 @@
     "multicoin-address-validator": "^0.5.26",
     "pg": "^8.20.0",
     "prisma": "^7.8.0",
+    "prom-client": "^15.1.3",
     "redis": "^4.6.11",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "typeorm": "^0.3.17",
-    "winston": "^3.19.0"
+    "winston": "^3.19.0",
+    "winston-loki": "^6.1.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
